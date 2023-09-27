@@ -8,6 +8,7 @@ from .summary import LinkSummary
 from bridge import bridge
 from common.expired_dict import ExpiredDict
 from common import const
+import os
 
 
 @plugins.register(
@@ -59,6 +60,7 @@ class LinkAI(Plugin):
                 return
             USER_FILE_MAP[_find_user_id(context) + "-sum_id"] = res.get("summary_id")
             _set_reply_text(res.get("summary") + "\n\n💬 发送 \"开启对话\" 可以开启与文件内容的对话", e_context, level=ReplyType.TEXT)
+            os.remove(file_path)
             return
 
         if (context.type == ContextType.SHARING and self._is_summary_open(context)) or \
@@ -158,6 +160,7 @@ class LinkAI(Plugin):
             # 保存插件配置
             super().save_config(self.config)
             _set_reply_text(f"应用设置成功: {app_code}", e_context, level=ReplyType.INFO)
+            return
 
         if len(cmd) == 3 and cmd[1] == "sum" and (cmd[2] == "open" or cmd[2] == "close"):
             # 知识库开关指令
@@ -169,12 +172,16 @@ class LinkAI(Plugin):
             if cmd[2] == "close":
                 tips_text = "关闭"
                 is_open = False
-            self.sum_config["enabled"] = is_open
-            _set_reply_text(f"文章总结功能{tips_text}", e_context, level=ReplyType.INFO)
-        else:
-            _set_reply_text(f"指令错误，请输入{_get_trigger_prefix()}linkai help 获取帮助", e_context,
-                            level=ReplyType.INFO)
+            if not self.sum_config:
+                _set_reply_text(f"插件未启用summary功能，请参考以下链添加插件配置\n\nhttps://github.com/zhayujie/chatgpt-on-wechat/blob/master/plugins/linkai/README.md", e_context, level=ReplyType.INFO)
+            else:
+                self.sum_config["enabled"] = is_open
+                _set_reply_text(f"文章总结功能{tips_text}", e_context, level=ReplyType.INFO)
             return
+
+        _set_reply_text(f"指令错误，请输入{_get_trigger_prefix()}linkai help 获取帮助", e_context,
+                        level=ReplyType.INFO)
+        return
 
     def _is_summary_open(self, context) -> bool:
         if not self.sum_config or not self.sum_config.get("enabled"):
@@ -281,4 +288,5 @@ def _find_sum_id(context):
 def _find_file_id(context):
     return USER_FILE_MAP.get(_find_user_id(context) + "-file_id")
 
-USER_FILE_MAP = ExpiredDict(60 * 60)
+
+USER_FILE_MAP = ExpiredDict(conf().get("expires_in_seconds") or 60 * 60)

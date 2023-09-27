@@ -93,7 +93,7 @@
 
 #### 配置
 
-该功能依赖 LinkAI的知识库及对话功能，需要在项目根目录的config.json中设置 `linkai_api_key`， 同时根据上述插件配置说明，添加 `summary` 部分的配置，设置 `enabled` 为 true。
+该功能依赖 LinkAI的知识库及对话功能，需要在项目根目录的config.json中设置 `linkai_api_key`， 同时根据上述插件配置说明，在插件config.json添加 `summary` 部分的配置，设置 `enabled` 为 true。
 
 如果不想创建 `plugins/linkai/config.json` 配置，可以直接通过 `$linkai sum open` 指令开启该功能。
 
@@ -103,6 +103,6 @@
 
 #### 限制
 
- 1. 文件目前 支持 `txt`, `docx`, `pdf`, `md`, `csv`格式，文件大小由 `max_file_size` 限制，最大不超过15M，文件字数最多可支持百万字的文件。但不建议上传字数过多的文件，一是token消耗过大，二是摘要很难覆盖到全部内容，但可以通过多轮对话来了解细节。
+ 1. 文件目前 支持 `txt`, `docx`, `pdf`, `md`, `csv`格式，文件大小由 `max_file_size` 限制，最大不超过15M，文件字数最多可支持百万字的文件。但不建议上传字数过多的文件，一是token消耗过大，二是摘要很难覆盖到全部内容，只能通过多轮对话来了解细节。
  2. 分享链接 目前仅支持 公众号文章，后续会支持更多文章类型及视频链接等
  3. 总结及对话的 费用与 LinkAI 3.5-4K 模型的计费方式相同，按文档内容的tokens进行计算
